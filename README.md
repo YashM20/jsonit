@@ -67,6 +67,22 @@ If you find JsonIt helpful, please consider giving it a ⭐ on GitHub to show yo
 ---
 Gitmoji
 
+Chores: 🧹
+Fix: 🛠️ or 🔧
+Initial: 🌱
+Release: 🚀
+Test: 🧪
+Refactor: 🔄
+Update: ⬆️
+Remove: 🗑️
+Documentation: 📚 or 📝
+Build: 🏗️
+Feature: ✨
+Improvement: 🔧
+Bug: 🐛
+Merge: 🔀
+Configuration: ⚙️
+
 ```
 gitmoji -c
 ```
