@@ -64,6 +64,21 @@ If you find JsonIt helpful, please consider giving it a ⭐ on GitHub to show yo
 
 ---
 
-[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+Gitmoji
+
+- 🎨 `feat`: A new feature 
+- 🐛 `fix`: A bug fix
+- 📝 `docs`: Documentation only changes
+- 💄 `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- 🎉 `chore`: Changes to the build process or auxiliary tools and libraries such as documentation generation
+- 🚀 `perf`: A code change that improves performance
+- 🧪 `test`: Adding missing tests
+- 🔧 `chore`: Changes to the build process or auxiliary tools and libraries such as documentation generation
+- 🧰 `build`: Changes that affect the build system or external dependencies
+- 📦 `ci`: Changes to our CI configuration files and scripts
+- 🔨 `refactor`: A code change that neither fixes a bug nor adds a feature
+- 💡 `idea`: An idea or suggestion
+- 🤔 `question`: A question via email or chat
+- 🔇 `comment`: A comment
+- 📌 `bookmark`: A bookmark
+
