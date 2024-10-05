@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Upload, Download, Code, Eye, Check, X, AlertTriangle, Menu, AlignJustify, Copy, Trash2, Search, RefreshCw, ChevronRight, ChevronLeft, FileCode, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,19 +19,22 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import dynamic from 'next/dynamic'
 import Ajv from 'ajv'
-import "@andypf/json-viewer"
+// import "@andypf/json-viewer"
 import { toast } from 'sonner'
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from 'next/image'
 import { GearIcon } from '@radix-ui/react-icons'
+import jsonitLogo from '/public/assets/images/JSONit_logo.png'
 
-// @ts-ignore
-const JSONEditor = dynamic(() => import('@json-editor/json-editor'), { ssr: false })
-const JSONViewer = dynamic(() => import('@andypf/json-viewer'), { ssr: false })
+// import JSONEditor from '@json-editor/json-editor'
+// import JSONViewer from '@andypf/json-viewer'
 
 const ajv = new Ajv()
+
+// const ClientSideWrapper = dynamic(() => Promise.resolve((props: { children: React.ReactNode }) => <>{props.children}</>), {
+//   ssr: false,
+// })
 
 export function ResizableJsonTool() {
   const [jsonData, setJsonData] = useState('')
@@ -45,31 +49,31 @@ export function ResizableJsonTool() {
   const [generatedTypes, setGeneratedTypes] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const schemaInputRef = useRef<HTMLInputElement>(null)
-  const editorRef = useRef<HTMLDivElement>(null)
+  const editorRef = useRef(null)
 
   useEffect(() => {
+    // @wts-expect-error   JSONEditor is not a valid constructor
     if (typeof window !== 'undefined' && editorRef.current) {
-      // @ts-ignore
-      const editor = new JSONEditor(editorRef.current, {
-        mode: 'code',
-        modes: ['code', 'tree', 'form', 'view'],
-        onChangeJSON: (json: any) => {
-          setJsonData(JSON.stringify(json, null, 2))
-          setParsedJson(json)
-        },
-        onEvent: (node: any, event: any) => {
-          if (event.type === 'click' && node.path) {
-            setCurrentPath(node.path)
-          }
-        },
-      })
-      setJsonEditor(editor)
+      // const editor = new JSONEditor(editorRef.current, {
+      //   mode: 'code',
+      //   modes: ['code', 'tree', 'form', 'view'],
+      //   onChangeJSON: (json: any) => {
+      //     setJsonData(JSON.stringify(json, null, 2))
+      //     setParsedJson(json)
+      //   },
+      //   onEvent: (node: any, event: any) => {
+      //     if (event.type === 'click' && node.path) {
+      //       setCurrentPath(node.path)
+      //     }
+      //   },
+      // })
+      // setJsonEditor(editor)
 
-      return () => {
-        if (editorRef.current) {
-          editorRef.current.innerHTML = ''
-        }
-      }
+      // return () => {
+      //   if (editorRef.current) {
+      //     editorRef.current.innerHTML = ''
+      //   }
+      // }
     }
   }, [])
 
@@ -187,31 +191,39 @@ export function ResizableJsonTool() {
   }, [jsonData, jsonEditor])
 
   const copyToClipboard = useCallback(() => {
-    navigator.clipboard.writeText(jsonData).then(() => {
-      toast.success('JSON copied to clipboard')
-    }, (err) => {
-      console.error('Failed to copy JSON:', err)
-      toast.error('Failed to copy JSON to clipboard')
-    })
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(jsonData).then(() => {
+        toast.success('JSON copied to clipboard')
+      }, (err) => {
+        console.error('Failed to copy JSON:', err)
+        toast.error('Failed to copy JSON to clipboard')
+      })
+    } else {
+      toast.error('Clipboard API not available')
+    }
   }, [jsonData])
 
   const pasteFromClipboard = useCallback(() => {
-    navigator.clipboard.readText().then((text) => {
-      try {
-        const parsed = JSON.parse(text)
-        setJsonData(JSON.stringify(parsed, null, 2))
-        setParsedJson(parsed)
-        jsonEditor?.set(parsed)
-        validateJson(parsed)
-        toast.success('JSON pasted from clipboard')
-      } catch (error) {
-        console.error('Failed to parse pasted JSON:', error)
-        toast.error('Failed to parse pasted content as JSON')
-      }
-    }, (err) => {
-      console.error('Failed to read clipboard:', err)
-      toast.error('Failed to read from clipboard')
-    })
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.readText().then((text) => {
+        try {
+          const parsed = JSON.parse(text)
+          setJsonData(JSON.stringify(parsed, null, 2))
+          setParsedJson(parsed)
+          jsonEditor?.set(parsed)
+          validateJson(parsed)
+          toast.success('JSON pasted from clipboard')
+        } catch (error) {
+          console.error('Failed to parse pasted JSON:', error)
+          toast.error('Failed to parse pasted content as JSON')
+        }
+      }, (err) => {
+        console.error('Failed to read clipboard:', err)
+        toast.error('Failed to read from clipboard')
+      })
+    } else {
+      toast.error('Clipboard API not available')
+    }
   }, [jsonEditor, validateJson])
 
   const resetData = useCallback(() => {
@@ -343,7 +355,7 @@ export function ResizableJsonTool() {
       toast.success('JSON is already valid')
     } catch (error) {
       // If parsing fails, attempt to fix common issues
-      let fixedJson = jsonData
+      const fixedJson = jsonData
         // Fix missing quotes around property names
         .replace(/(\w+)(?=\s*:)/g, '"$1"')
         // Fix single quotes to double quotes
@@ -368,13 +380,23 @@ export function ResizableJsonTool() {
     }
   }, [jsonData, jsonEditor])
 
+  // <ClientSideWrapper>
+  if (!(typeof window !== 'undefined' && typeof document !== 'undefined')) {
+    // Now it's safe to use `HTMLElement` or anything that accesses the DOM
+    return <>
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    </>
+  }
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground dark:bg-[#181823] dark:text-white/90 p-2">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
           <span className="flex items-center flex-row gap-1">
             <Image
-              src={require("/public/assets/images/JSONit_logo.png")}
+              src={jsonitLogo}
               alt="Json It"
               width={32}
               height={32}
@@ -519,7 +541,10 @@ export function ResizableJsonTool() {
                       {viewMode === 'code' ? (
                         <pre className="text-sm json-viewer">{JSON.stringify(parsedJson, null, 2)}</pre>
                       ) : (
-                        parsedJson && <JSONViewer data={parsedJson} />
+                        // parsedJson && <JSONViewer data={parsedJson} />
+                        <div>
+                          <h1>Loading...</h1>
+                        </div>
                       )}
                     </ScrollArea>
                   </TabsContent>
@@ -572,4 +597,5 @@ export function ResizableJsonTool() {
       </ResizablePanelGroup>
     </div>
   )
+  // </ClientSideWrapper>
 }
