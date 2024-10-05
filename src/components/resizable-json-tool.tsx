@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Upload, Download, Code, Eye, Check, X, AlertTriangle, Menu, AlignJustify, Copy, Trash2, Search, RefreshCw, ChevronRight, ChevronLeft, FileCode, Tool, Zap } from 'lucide-react'
+import { Upload, Download, Code, Eye, Check, X, AlertTriangle, Menu, AlignJustify, Copy, Trash2, Search, RefreshCw, ChevronRight, ChevronLeft, FileCode, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -24,7 +24,9 @@ import "@andypf/json-viewer"
 import { toast } from 'sonner'
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from 'next/image'
+import { GearIcon } from '@radix-ui/react-icons'
 
+// @ts-ignore
 const JSONEditor = dynamic(() => import('@json-editor/json-editor'), { ssr: false })
 const JSONViewer = dynamic(() => import('@andypf/json-viewer'), { ssr: false })
 
@@ -47,14 +49,15 @@ export function ResizableJsonTool() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && editorRef.current) {
+      // @ts-ignore
       const editor = new JSONEditor(editorRef.current, {
         mode: 'code',
         modes: ['code', 'tree', 'form', 'view'],
-        onChangeJSON: (json) => {
+        onChangeJSON: (json: any) => {
           setJsonData(JSON.stringify(json, null, 2))
           setParsedJson(json)
         },
-        onEvent: (node, event) => {
+        onEvent: (node: any, event: any) => {
           if (event.type === 'click' && node.path) {
             setCurrentPath(node.path)
           }
@@ -99,7 +102,8 @@ export function ResizableJsonTool() {
         const validate = ajv.compile(schema)
         const valid = validate(json)
         if (!valid) {
-          setValidationErrors(validate.errors?.map(error => error.message) || [])
+          const result = validate?.errors?.map(error => error.message) as string[]
+          setValidationErrors(result?.length > 0 ? result : [])
         } else {
           setValidationErrors([])
           toast.success('JSON is valid according to the schema')
@@ -116,7 +120,8 @@ export function ResizableJsonTool() {
       const validate = ajv.compile(schema)
       const valid = validate(json)
       if (!valid) {
-        setValidationErrors(validate.errors?.map(error => error.message) || [])
+        const result = validate?.errors?.map(error => error.message) as string[]
+        setValidationErrors(result?.length > 0 ? result : [])
       } else {
         setValidationErrors([])
       }
@@ -425,7 +430,7 @@ export function ResizableJsonTool() {
                   <Download className="mr-2 h-4 w-4" /> Download Types
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={fixJson}>
-                  <Tool className="mr-2 h-4 w-4" /> Fix JSON
+                  <GearIcon className="mr-2 h-4 w-4" /> Fix JSON
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
