@@ -1,4 +1,6 @@
-# ![JsonIt Logo](https://link-to-your-logo.png)
+
+<img src="https://github.com/YashM20/jsonit/blob/main/public/assets/images/JSONit_logo.png" alt="JsonIt Logo" width="100" height="100" /> 
+
 # 🚀 JsonIt: Your Go-To JSON Tool 
 
 💡 Transforming JSON Data with Ease.
